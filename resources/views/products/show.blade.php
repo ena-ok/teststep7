@@ -35,7 +35,7 @@
     
 
         <dt class="col-sm-3">メーカー</dt>
-        <dd class="col-sm-9">{{ $product->company->name }}</dd>
+        <dd class="col-sm-9">{{ $product->company->name  ?? '未設定' }}</dd>
 
         <dt class="col-sm-3">価格</dt>
         <dd class="col-sm-9">{{ $product->price }}</dd>

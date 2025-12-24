@@ -12,36 +12,21 @@ class ProductController extends Controller
     public function index(Request $request)
     {
     
-        $keyword = $request->input('keyword');
-        $company = $request->input('company');
+        $query = Product::with('company');
 
-      
-        $query = Product::query();
-
-       
-        if ($keyword) {
-            $query->where('name', 'like', "%{$keyword}%");
+       if ($request->filled('keyword')) {
+        $query->where('product_name', 'LIKE', '%' . $request->keyword . '%');
         }
 
-        
-        if ($company) {
-            $query->where('company_id', $company);
-        }
-
-        $products = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
-
-        $companies =  \App\Models\Company::pluck('name', 'id');
-
-        return view('products.index', compact('products', 'companies'));
+       if ($request->filled('company_id')) {
+        $query->where('company_id', $request->company_id);
     }
+       
+       $products = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
+       
+       $companies = Company::pluck('company_name', 'id');
 
-    
-
-    public function create()
-    {
-       $companies = Company::all();
-       return view('products.create', compact('companies'));
-
+    return view('products.index', compact('products', 'companies'));
     }
 
     
@@ -49,21 +34,36 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'company' => 'required|string|max:255',
+            'company_id' => 'required|integer',
             'price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
             'comment' => 'nullable|string',
             'img_path' => 'nullable|image|max:2048'
         ]);
 
-        Product::create($request->all());
+        $data = [
+            'product_name' => $request->name,
+            'company_id' => $request->company_id,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            'comment' => $request->comment,
+        ];
+
+
+
+        if ($request->hasFile('img_path')) {
+           $data['img_path'] = $request->file('img_path')->store('products', 'public');
+           }
+
+         Product::create($data);
 
         return redirect()->route('products.index')->with('success', '商品を追加しました');
     }
 
    
-    public function show(Product $product)
+    public function show($id)
     {
+        $product = Product::with('company')->findOrFail($id);
         return view('products.show', compact('product'));
     }
 
@@ -81,16 +81,30 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'company' => 'required|string|max:255',
+            'company_id' => 'required|integer',
             'price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
             'comment' => 'nullable|string',
+            'img_path' => 'nullable|image|max:2048'
         ]);
 
-        $product->update($request->all());
+        if ($request->hasFile('img_path')) {
+            $data['img_path'] = $request->file('img_path')->store('products', 'public');
+           }
+           
+
+        $product->update($data);
 
         return redirect()->route('products.index')->with('success', '商品を更新しました');
     }
+
+    public function create()
+    {
+        $companies = Company::all();
+        return view('products.create', compact('companies'));
+
+    }
+
 
     
     public function destroy(Product $product)

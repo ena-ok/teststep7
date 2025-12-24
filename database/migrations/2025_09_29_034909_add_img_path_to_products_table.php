@@ -6,27 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-        $table->string('img_path')->nullable()->after('comment');
+        Schema::create('companies', function (Blueprint $table) {
+            $table->id(); 
+            $table->string('company_name'); 
+            $table->string('street_address')->nullable(); 
+            $table->string('representative_name')->nullable(); 
+            $table->timestamp('created_at')->useCurrent(); 
+            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate(); 
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    
+    public function down(): void
     {
-        Schema::table('products', function (Blueprint $table) {
-        $table->dropColumn('img_path');
-        });
+        Schema::dropIfExists('companies');
     }
 };

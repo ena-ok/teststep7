@@ -10,18 +10,13 @@
         </div>
     @endif
 
-    @foreach($companies as $company)
-    <option value="{{ $company->id }}">{{ $company->name }}</option>
-    @endforeach
-
-
     <form action="{{ route('products.store') }}" method="POST">
         @csrf
 
         <div class="mb-3">
-            <label for="product_name" class="form-label">商品名</label>
-            <input type="text" name="product_name" id="product_name" value="{{ old('name') }}" class="form-control">
-            @error('product_name') <div class="text-danger">{{ $message }}</div> @enderror
+            <label for="name" class="form-label">商品名</label>
+            <input type="text" name="name" id="name" value="{{ old('name') }}" class="form-control">
+            @error('name') <div class="text-danger">{{ $message }}</div> @enderror
         </div>
 
         <div class="mb-3">
@@ -30,7 +25,7 @@
                 <option value="">選択してください</option>
                 @foreach($companies as $company)
                     <option value="{{ $company->id }}" {{ old('company_id') == $company->id ? 'selected' : '' }}>
-                        {{ $company->name }}
+                        {{ $company->company_name }}
                     </option>
                 @endforeach
             </select>
