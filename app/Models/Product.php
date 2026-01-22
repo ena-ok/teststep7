@@ -16,7 +16,8 @@ class Product extends Model
         'company_id', 
         'comment', 
         'img_path',
-     ];
+    ];
+
     public function company()
     {
         return $this->belongsTo(Company::class);
@@ -25,5 +26,21 @@ class Product extends Model
     public function sales()
     {
         return $this->hasMany(Sale::class);
+    }
+
+    public function scopeSearch($query, $keyword)
+    {
+        if (! empty($keyword)) {
+            $query->where('product_name', 'LIKE', '%' . $keyword . '%');
+        }
+    }
+
+    public function scopeFilterByCompany($query, $companyId)
+    {
+        if (! empty($companyId)) {
+            $query->where('company_id', $companyId);
+        }
+
+        return $query;
     }
 }

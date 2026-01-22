@@ -11,22 +11,18 @@ class ProductController extends Controller
    
     public function index(Request $request)
     {
-    
-        $query = Product::with('company');
+        $query = Product::with('company')
+         ->search($request->keyword)
+         ->filterByCompany($request->company_id);
 
-       if ($request->filled('keyword')) {
-        $query->where('product_name', 'LIKE', '%' . $request->keyword . '%');
-        }
+        $products = $query
+         ->orderBy('id', 'desc')
+         ->paginate(10)
+         ->withQueryString();  
+         
+        $companies = Company::pluck('company_name', 'id');
 
-       if ($request->filled('company_id')) {
-        $query->where('company_id', $request->company_id);
-    }
-       
-       $products = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
-       
-       $companies = Company::pluck('company_name', 'id');
-
-    return view('products.index', compact('products', 'companies'));
+        return view('products.index', compact('products', 'companies'));
     }
 
     
@@ -55,7 +51,7 @@ class ProductController extends Controller
            $data['img_path'] = $request->file('img_path')->store('products', 'public');
            }
 
-         Product::create($data);
+        Product::create($data);
 
         return redirect()->route('products.index')->with('success', '商品を追加しました');
     }
@@ -76,6 +72,12 @@ class ProductController extends Controller
         return view('products.edit', compact('product','companies'));
     }
 
+    public function create()
+    {
+        $companies = Company::all();
+        return view('products.create', compact('companies'));
+    }
+
     
     public function update(Request $request, Product $product)
     {
@@ -88,6 +90,14 @@ class ProductController extends Controller
             'img_path' => 'nullable|image|max:2048'
         ]);
 
+        $data = [
+            'product_name' => $request->name,
+            'company_id' => $request->company_id,
+            'price' => $request->price,
+            'stock' => $request->stock,
+            'comment' => $request->comment,
+    ];
+
         if ($request->hasFile('img_path')) {
             $data['img_path'] = $request->file('img_path')->store('products', 'public');
            }
@@ -97,15 +107,6 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')->with('success', '商品を更新しました');
     }
-
-    public function create()
-    {
-        $companies = Company::all();
-        return view('products.create', compact('companies'));
-
-    }
-
-
     
     public function destroy(Product $product)
     {

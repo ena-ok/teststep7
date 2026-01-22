@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.product-card {
+    width: 90%;
+    max-width: 1200px;
+}
+

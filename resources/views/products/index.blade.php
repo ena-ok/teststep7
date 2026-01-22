@@ -2,7 +2,8 @@
 
 @section('content')
 <div class="d-flex justify-content-center mt-5">
-    <div class="card shadow p-4" style="width: 90%; max-width: 1200px;">
+    <div class="card shadow p-4 product-card">
+
         <h2 class="mb-4 text-center">商品情報一覧</h2>
 
     <!-- 検索フォーム -->
@@ -44,7 +45,7 @@
                 <tr>
                     <td>{{ $product->id }}</td>
                     <td>
-                        @if($product->img_path)
+                        @if ($product->img_path)
                             <img src="{{ asset('storage/' . $product->img_path) }}" alt="商品画像" width="60">
                         @else
                             画像なし
@@ -53,12 +54,13 @@
                     <td>{{ $product->product_name }}</td>
                     <td>¥{{ number_format($product->price) }}</td>
                     <td>{{ $product->stock }}</td>
-                    <td>{{ $product->company->name ?? '不明' }}</td>
+                    <td>{{ $product->company->company_name ?? '不明' }}</td>
                     <td>
                         <a href="{{ route('products.show', $product) }}" class="btn btn-info btn-sm text-white">詳細</a>
                         <a href="{{ route('products.edit', $product) }}" class="btn btn-secondary btn-sm">編集</a>
-                        <form action="{{ route('products.destroy', $product) }}" method="POST" class="d-inline"
-                              onsubmit="return confirm('本当に削除しますか？');">
+                        <form action="{{ route('products.destroy', $product) }}" method="POST"
+                             class="d-inline js-delete-form">
+
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn btn-danger btn-sm">削除</button>
