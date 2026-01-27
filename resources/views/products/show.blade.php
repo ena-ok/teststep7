@@ -1,18 +1,19 @@
 @extends('layouts.app')
 
+@section('header')
+    <h1 class="text-xl font-semibold text-gray-800">
+        商品情報詳細
+    </h1>
+@endsection
+
 @section('content')
 <div class="container">
-    <h1>商品情報詳細</h1>
 
     <a href="{{ route('products.index') }}" class="btn btn-primary mt-3">商品一覧画面に戻る</a>
 
     <div class="card">
         <div class="card-body">
             <h2 class="card-title">{{ $product->name }}</h2>
-            <p class="card-text">価格: {{ $product->price }} 円</p>
-            <p class="card-text">説明: {{ $product->description }}</p>
-            <p class="card-text">在庫数: {{ $product->stock }}</p>
-        </div>
 
     <dl class="row mt-3" >
         <dt class="col-sm-3">商品情報ID</dt>
@@ -21,12 +22,10 @@
         <dt class="col-sm-3">商品画像</dt>
         <dd class="col-sm-9">
             @if($product->img_path)
-            <img src="{{ asset($product->img_path) }}" 
-             alt="商品画像"
-             width="300"
-             height="auto"
-             style="max-height: 400px;
-                    object-fit: contain;">
+            <img src="{{ asset('storage/' . $product->img_path) }}">
+                alt="商品画像"
+                width="300"
+                style="max-height: 400px; object-fit: contain;">
 
         @else
                 商品画像がありません
@@ -35,7 +34,7 @@
     
 
         <dt class="col-sm-3">メーカー</dt>
-        <dd class="col-sm-9">{{ $product->company->name  ?? '未設定' }}</dd>
+        <dd class="col-sm-9">{{ $product->company->company_name ?? '未設定' }}</dd>
 
         <dt class="col-sm-3">価格</dt>
         <dd class="col-sm-9">{{ $product->price }}</dd>
@@ -48,7 +47,7 @@
 
     </dl>
     <a href="{{ route('products.edit', $product) }}" class="btn btn-primary btn-sm mx-1">商品情報を編集する</a>
-
+  </div>
 </div>
 @endsection
 

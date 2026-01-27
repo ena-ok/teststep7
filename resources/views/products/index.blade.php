@@ -1,10 +1,14 @@
 @extends('layouts.app')
 
+@section('header')
+    <h1 class="text-xl font-semibold text-gray-800">
+        商品情報一覧
+    </h1>
+@endsection
+
 @section('content')
 <div class="d-flex justify-content-center mt-5">
     <div class="card shadow p-4 product-card">
-
-        <h2 class="mb-4 text-center">商品情報一覧</h2>
 
     <!-- 検索フォーム -->
     <form method="GET" action="{{ route('products.index') }}" class="row g-3 mb-4">
@@ -57,7 +61,6 @@
                     <td>{{ $product->company->company_name ?? '不明' }}</td>
                     <td>
                         <a href="{{ route('products.show', $product) }}" class="btn btn-info btn-sm text-white">詳細</a>
-                        <a href="{{ route('products.edit', $product) }}" class="btn btn-secondary btn-sm">編集</a>
                         <form action="{{ route('products.destroy', $product) }}" method="POST"
                              class="d-inline js-delete-form">
 

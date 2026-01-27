@@ -1,8 +1,14 @@
 @extends('layouts.app')
 
+@section('header')
+    <h1 class="text-xl font-semibold text-gray-800">
+        商品編集
+    </h1>
+@endsection
+
+
 @section('content')
     <div class="container">
-         <h1>商品編集</h1>
 
         @if(session('success'))
           <div class="alert alert-success">
@@ -33,12 +39,12 @@
                 <label class="form-label">企業</label>
                 <select name="company_id" class="form-control">
                     <option value="">選択してください</option>
-                    @foreach($companies as $company)
-                        <option value="{{ $company->id }}" 
-                            {{ old('company_id', $product->company_id) == $company->id ? 'selected' : '' }}>
-                            {{ $company->name }}
-                        </option>
-                    @endforeach
+                    @foreach($companies as $id => $name)
+                    <option value="{{ $id }}"
+                        {{ old('company_id', $product->company_id) == $id ? 'selected' : '' }}>
+                        {{ $name }}
+                    </option>
+                  @endforeach
                 </select>
             </div>
 

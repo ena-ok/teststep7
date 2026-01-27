@@ -30,15 +30,16 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'company_id' => 'required|integer',
+            'company_id' => 'required|exists:companies,id',
             'price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
             'comment' => 'nullable|string',
             'img_path' => 'nullable|image|max:2048'
         ]);
 
+      try {
         $data = [
-            'product_name' => $request->name,
+            'name' => $request->name,
             'company_id' => $request->company_id,
             'price' => $request->price,
             'stock' => $request->stock,
@@ -54,9 +55,16 @@ class ProductController extends Controller
         Product::create($data);
 
         return redirect()->route('products.index')->with('success', '商品を追加しました');
-    }
+     }
 
-   
+     catch (\Exception $e) {
+        return back()
+            ->withInput()
+            ->with('error', '商品登録に失敗しました');
+    }
+}
+
+
     public function show($id)
     {
         $product = Product::with('company')->findOrFail($id);
@@ -64,12 +72,10 @@ class ProductController extends Controller
     }
 
    
-    public function edit($id)
+    public function edit(Product $product)
     {
-        $product = Product::findOrFail($id);
-        $companies = Company::all(); 
-
-        return view('products.edit', compact('product','companies'));
+        $companies = Company::pluck('company_name', 'id');
+        return view('products.edit', compact('product', 'companies'));
     }
 
     public function create()
@@ -83,15 +89,15 @@ class ProductController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'company_id' => 'required|integer',
+            'company_id' => 'required|exists:companies,id',
             'price' => 'required|integer|min:0',
             'stock' => 'required|integer|min:0',
             'comment' => 'nullable|string',
             'img_path' => 'nullable|image|max:2048'
         ]);
-
+      try {
         $data = [
-            'product_name' => $request->name,
+            'name' => $request->name,
             'company_id' => $request->company_id,
             'price' => $request->price,
             'stock' => $request->stock,
@@ -105,14 +111,34 @@ class ProductController extends Controller
 
         $product->update($data);
 
-        return redirect()->route('products.index')->with('success', '商品を更新しました');
+        return redirect()
+             ->route('products.index')
+             ->with('success', '商品を更新しました');
+      
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', '商品更新に失敗しました');
+        }
+    
+    
+    
     }
     
     public function destroy(Product $product)
     {
-        $product->delete();
+        try {
+            $product->delete();
 
-        return redirect()->route('products.index')->with('success', '商品を削除しました');
+            return redirect()
+                ->route('products.index')
+                ->with('success', '商品を削除しました');
+     
+        } catch (\Exception $e) {
+            return back()
+                ->with('error', '商品削除に失敗しました');
+    
+        }
     }
 }
 

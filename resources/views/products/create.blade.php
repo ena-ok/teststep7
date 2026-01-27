@@ -1,8 +1,14 @@
 @extends('layouts.app')
 
+@section('header')
+    <h1 class="text-xl font-semibold text-gray-800">
+        商品新規登録
+    </h1>
+@endsection
+
+
 @section('content')
 <div class="container">
-    <h1>商品新規登録</h1>
 
     @if(session('success'))
         <div class="alert alert-success">
@@ -10,7 +16,9 @@
         </div>
     @endif
 
-    <form action="{{ route('products.store') }}" method="POST">
+    <form action="{{ route('products.store') }}"
+          method="POST"
+          enctype="multipart/form-data"> 
         @csrf
 
         <div class="mb-3">
@@ -23,13 +31,15 @@
             <label for="company_id" class="form-label">企業名</label>
             <select name="company_id" id="company_id" class="form-control">
                 <option value="">選択してください</option>
-                @foreach($companies as $company)
-                    <option value="{{ $company->id }}" {{ old('company_id') == $company->id ? 'selected' : '' }}>
-                        {{ $company->company_name }}
+
+                @foreach($companies as $id => $name)
+                    <option value="{{ $id }}"
+                        {{ old('company_id') == $id ? 'selected' : '' }}>
+                        {{ $name }}
                     </option>
                 @endforeach
             </select>
-            @error('company_id') <div class="text-danger">{{ $message }}</div> @enderror
+                @error('company_id') <div class="text-danger">{{ $message }}</div> @enderror
         </div>
 
         <div class="mb-3">
