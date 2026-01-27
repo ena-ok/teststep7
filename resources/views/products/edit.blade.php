@@ -26,7 +26,10 @@
             </div>
          @endif
 
-         <form action="{{ route('products.update', $product->id) }}" method="POST">
+         <form action="{{ route('products.update', $product->id) }}"
+               method="POST" 
+               enctype="multipart/form-data">
+         
               @csrf
               @method('PUT')
 
@@ -39,7 +42,7 @@
                 <label class="form-label">企業</label>
                 <select name="company_id" class="form-control">
                     <option value="">選択してください</option>
-                    @foreach($companies as $id => $name)
+                  @foreach($companies as $id => $name)
                     <option value="{{ $id }}"
                         {{ old('company_id', $product->company_id) == $id ? 'selected' : '' }}>
                         {{ $name }}
@@ -57,13 +60,19 @@
 
         <div class="mb-3">
             <label class="form-label">説明</label>
-            <textarea name="description" class="form-control">{{ old('description', $product->description) }}</textarea>
+            <textarea name="comment" class="form-control">{{ old('comment', $product->comment) }}</textarea>
         </div>
 
         <div class="mb-3">
             <label class="form-label">在庫数</label>
             <input type="number" name="stock" value="{{ old('stock', $product->stock) }}" class="form-control">
         </div>
+
+        <div class="mb-3">
+            <label class="form-label">商品画像</label>
+            <input type="file" name="img_path" class="form-control">
+        </div>
+
 
         <button type="submit" class="btn btn-primary">更新</button>
         <a href="{{ route('products.show', $product->id) }}" class="btn btn-secondary">詳細に戻る</a>

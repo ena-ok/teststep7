@@ -35,7 +35,20 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'comment' => 'nullable|string',
             'img_path' => 'nullable|image|max:2048'
-        ]);
+        ],
+    
+        [
+            'name.required' => '商品名は必須です',
+            'company_id.required' => '企業名を選択してください',
+            'company_id.exists' => '正しい企業を選択してください',
+            'price.required' => '価格は必須です',
+            'price.integer' => '価格は数値で入力してください',
+            'stock.required' => '在庫数は必須です',
+            'stock.integer' => '在庫数は数値で入力してください',
+            'img_path.image' => '画像ファイルを選択してください',
+        ]
+    
+    );
 
       try {
         $data = [
@@ -80,7 +93,7 @@ class ProductController extends Controller
 
     public function create()
     {
-        $companies = Company::all();
+        $companies = Company::pluck('company_name', 'id');
         return view('products.create', compact('companies'));
     }
 
@@ -94,7 +107,19 @@ class ProductController extends Controller
             'stock' => 'required|integer|min:0',
             'comment' => 'nullable|string',
             'img_path' => 'nullable|image|max:2048'
-        ]);
+        ],
+        [
+            'name.required' => '商品名は必須です',
+            'company_id.required' => '企業名を選択してください',
+            'company_id.exists' => '正しい企業を選択してください',
+            'price.required' => '価格は必須です',
+            'price.integer' => '価格は数値で入力してください',
+            'stock.required' => '在庫数は必須です',
+            'stock.integer' => '在庫数は数値で入力してください',
+            'img_path.image' => '画像ファイルを選択してください',
+        ]
+    
+    );
       try {
         $data = [
             'name' => $request->name,

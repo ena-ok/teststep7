@@ -10,7 +10,6 @@
 <div class="d-flex justify-content-center mt-5">
     <div class="card shadow p-4 product-card">
 
-    <!-- 検索フォーム -->
     <form method="GET" action="{{ route('products.index') }}" class="row g-3 mb-4">
         <div class="col-md-5">
             <input type="text" name="keyword" value="{{ request('keyword') }}" class="form-control" placeholder="検索キーワード">
@@ -31,7 +30,6 @@
          </div>
     </form>
 
-    <!-- 一覧テーブル -->
     <table class="table table-striped align-middle text-center">
         <thead class="table-dark">
             <tr>
@@ -78,7 +76,6 @@
         </tbody>
     </table>
 
-    <!-- ページネーション -->
     <div class="mt-6">
         {{ $products->links() }}
     </div>
