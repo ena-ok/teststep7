@@ -6,17 +6,17 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up(): void
+    public function up()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->string('img_path')->nullable()->after('comment');
+            $table->renameColumn('product_name', 'name');
         });
     }
 
-    public function down(): void
+    public function down()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('img_path');
+            $table->renameColumn('name', 'product_name');
         });
     }
 };

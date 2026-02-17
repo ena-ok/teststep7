@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Models\Company; 
+use App\Http\Requests\ProductRequest;
+
 
 class ProductController extends Controller
 {
@@ -26,39 +28,10 @@ class ProductController extends Controller
     }
 
     
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'company_id' => 'required|exists:companies,id',
-            'price' => 'required|integer|min:0',
-            'stock' => 'required|integer|min:0',
-            'comment' => 'nullable|string',
-            'img_path' => 'nullable|image|max:2048'
-        ],
-    
-        [
-            'name.required' => '商品名は必須です',
-            'company_id.required' => '企業名を選択してください',
-            'company_id.exists' => '正しい企業を選択してください',
-            'price.required' => '価格は必須です',
-            'price.integer' => '価格は数値で入力してください',
-            'stock.required' => '在庫数は必須です',
-            'stock.integer' => '在庫数は数値で入力してください',
-            'img_path.image' => '画像ファイルを選択してください',
-        ]
-    
-    );
 
-      try {
-        $data = [
-            'name' => $request->name,
-            'company_id' => $request->company_id,
-            'price' => $request->price,
-            'stock' => $request->stock,
-            'comment' => $request->comment,
-        ];
-
+        $data = $request->validated();
 
 
         if ($request->hasFile('img_path')) {
@@ -70,12 +43,7 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', '商品を追加しました');
      }
 
-     catch (\Exception $e) {
-        return back()
-            ->withInput()
-            ->with('error', '商品登録に失敗しました');
-    }
-}
+
 
 
     public function show($id)
@@ -98,36 +66,11 @@ class ProductController extends Controller
     }
 
     
-    public function update(Request $request, Product $product)
+    public function update(ProductRequest $request, Product $product)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'company_id' => 'required|exists:companies,id',
-            'price' => 'required|integer|min:0',
-            'stock' => 'required|integer|min:0',
-            'comment' => 'nullable|string',
-            'img_path' => 'nullable|image|max:2048'
-        ],
-        [
-            'name.required' => '商品名は必須です',
-            'company_id.required' => '企業名を選択してください',
-            'company_id.exists' => '正しい企業を選択してください',
-            'price.required' => '価格は必須です',
-            'price.integer' => '価格は数値で入力してください',
-            'stock.required' => '在庫数は必須です',
-            'stock.integer' => '在庫数は数値で入力してください',
-            'img_path.image' => '画像ファイルを選択してください',
-        ]
-    
-    );
+        
       try {
-        $data = [
-            'name' => $request->name,
-            'company_id' => $request->company_id,
-            'price' => $request->price,
-            'stock' => $request->stock,
-            'comment' => $request->comment,
-    ];
+        $data = $request->validated();
 
         if ($request->hasFile('img_path')) {
             $data['img_path'] = $request->file('img_path')->store('products', 'public');

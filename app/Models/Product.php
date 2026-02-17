@@ -10,7 +10,7 @@ class Product extends Model
     use HasFactory;
 
     protected $fillable = [
-        'product_name', 
+        'name', 
         'price', 
         'stock', 
         'company_id', 
@@ -30,10 +30,12 @@ class Product extends Model
 
     public function scopeSearch($query, $keyword)
     {
-        if (! empty($keyword)) {
-            $query->where('product_name', 'LIKE', '%' . $keyword . '%');
+        if ($keyword) {
+            return $query->where('name', 'LIKE', "%{$keyword}%");
         }
+        return $query;
     }
+
 
     public function scopeFilterByCompany($query, $companyId)
     {
