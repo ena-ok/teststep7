@@ -17,14 +17,53 @@ class ProductController extends Controller
          ->search($request->keyword)
          ->filterByCompany($request->company_id);
 
+        if ($request->filled('price_min')) {
+            $query->where('price', '>=', $request->price_min);
+        }
+
+        if ($request->filled('price_max')){
+            $query->where('price', '<=', $request->price_max);
+        }
+
+        if ($request->filled('stock_min')) {
+            $query->where('stock', '>=', $request->stock_min);
+        }
+
+        if ($request->filled('stock_max')) {
+            $query->where('stock', '<=', $request->stock_max);
+        }
+
+        $sort = $request->get('sort', 'id');
+        $direction = $request->get('direction', 'desc');
+
+        $sortableColumns = ['id', 'name', 'price', 'stock'];
+
+        if (!in_array($sort, $sortableColumns)) {
+            $sort = 'id';
+        }
+
+        if (!in_array($direction, ['asc', 'desc'])) {
+            $direction = 'desc';
+        }
+
+
         $products = $query
-         ->orderBy('id', 'desc')
+         ->orderBy($sort, $direction)
          ->paginate(10)
          ->withQueryString();  
          
         $companies = Company::pluck('company_name', 'id');
 
-        return view('products.index', compact('products', 'companies'));
+        if ($request->ajax()) {
+          return response()->json([
+            'products' => $products,
+            'sort' => $sort,
+            'direction' => $direction,
+        ]);
+
+        }
+        
+        return view('products.index', compact('products', 'companies','sort', 'direction'));
     }
 
     
@@ -44,9 +83,7 @@ class ProductController extends Controller
      }
 
 
-
-
-    public function show($id)
+    public function show(int $id)
     {
         $product = Product::with('company')->findOrFail($id);
         return view('products.show', compact('product'));
@@ -98,11 +135,25 @@ class ProductController extends Controller
         try {
             $product->delete();
 
+            if (request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => '商品を削除しました'
+            ]);
+            }
+
             return redirect()
                 ->route('products.index')
                 ->with('success', '商品を削除しました');
      
         } catch (\Exception $e) {
+            if (request()->ajax()) {
+            return response()->json([
+                'success' => false,
+                'message' => '削除に失敗しました'
+            ], 500);
+        }
+
             return back()
                 ->with('error', '商品削除に失敗しました');
     

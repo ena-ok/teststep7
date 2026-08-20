@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Product extends Model
 {
@@ -28,7 +29,7 @@ class Product extends Model
         return $this->hasMany(Sale::class);
     }
 
-    public function scopeSearch($query, $keyword)
+    public function scopeSearch(Builder $query, ?string $keyword): Builder
     {
         if ($keyword) {
             return $query->where('name', 'LIKE', "%{$keyword}%");
@@ -37,7 +38,7 @@ class Product extends Model
     }
 
 
-    public function scopeFilterByCompany($query, $companyId)
+    public function scopeFilterByCompany(Builder $query, ?int $companyId): Builder
     {
         if (! empty($companyId)) {
             $query->where('company_id', $companyId);
