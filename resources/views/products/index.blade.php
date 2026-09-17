@@ -10,7 +10,7 @@
 <div class="d-flex justify-content-center mt-5">
     <div class="card shadow p-4 product-card">
 
-    <form id="search-form" class="row g-3 mb-4">
+    <form id="search-form" action="{{ route('products.index') }}" method="GET" class="row g-3 mb-4">
         <div class="col-md-5">
             <input type="text" name="keyword" value="{{ request('keyword') }}" class="form-control" placeholder="検索キーワード">
         </div>
@@ -112,9 +112,10 @@
               
     </table>
 
-    <div class="mt-6">
-        {{ $products->links() }}
+    <div class="mt-6" id="pagination">
+    {{ $products->links() }}
     </div>
+
 </div>
 </div>
 
@@ -124,7 +125,7 @@
       let currentSort = 'id';
       let currentDirection = 'desc';
 
-       function fetchProducts() {
+       function fetchProducts(page = 1) {
 
        const params = new URLSearchParams({
         keyword: document.querySelector('[name="keyword"]').value,
@@ -134,16 +135,18 @@
         stock_min: document.querySelector('[name="stock_min"]').value,
         stock_max: document.querySelector('[name="stock_max"]').value,
         sort: currentSort,
-        direction: currentDirection
+        direction: currentDirection,
+        page: page
+
     });
 
-    fetch(`{{ route('products.index') }}?${params.toString()}`, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
+    $.ajax({
+    url: `{{ route('products.index') }}?${params.toString()}`,
+    type: 'GET',
+    headers: {
+        'X-Requested-With': 'XMLHttpRequest'
+    },
+    success: function(data) {
 
         let html = '';
 
@@ -200,9 +203,22 @@
         }
 
         document.getElementById('product-list').innerHTML = html;
+        $('#pagination').html(data.products.links);
 
+        }
         });
 }
+
+
+$(document).on('click', '#pagination a', function(e) {
+    e.preventDefault();
+
+    const url = new URL(this.href);
+    const page = url.searchParams.get('page');
+
+    fetchProducts(page);
+});
+
 
 document.getElementById('search-form').addEventListener('submit', function(e) {
     e.preventDefault();
@@ -244,52 +260,32 @@ document.querySelectorAll('.sortable').forEach(header => {
         return;
     }
 
-    fetch(form.action, {
-
-        method: 'POST',
-
-        headers: {
-            'X-CSRF-TOKEN':
-                form.querySelector('[name="_token"]').value,
-
-            'X-HTTP-Method-Override': 'DELETE',
-
-            'Accept': 'application/json',
-
-            'X-Requested-With': 'XMLHttpRequest'
-        }
-
-    })
-    .then(response => {
-
-        if (!response.ok) {
-            throw new Error('削除に失敗しました');
-        }
-
-        return response.json();
-
-    })
-    .then(data => {
-
-    
+    $.ajax({
+    url: form.action,
+    type: 'POST',
+    data: {
+        _token: form.querySelector('[name="_token"]').value,
+        _method: 'DELETE'
+    },
+    headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json'
+    },
+    success: function(data) {
         const row = form.closest('tr');
 
-    
         if (row) {
             row.remove();
         }
-
-    })
-    .catch(error => {
-
-        console.error('削除エラー:', error);
-
+    },
+    error: function(xhr) {
+        console.error('削除エラー:', xhr);
         alert('商品の削除に失敗しました。');
+    }
 
     });
 
 });
-
 
 </script>
 @endsection
