@@ -178,7 +178,12 @@ if (document.getElementById('product-list')) {
 
         event.preventDefault();
 
-        const page = $(this).data('page');
+        let page = $(this).data('page');
+
+        if (!page) {
+            const url = new URL($(this).attr('href'), window.location.origin);
+            page = url.searchParams.get('page');
+        }
 
         fetchProducts(page);
     });
